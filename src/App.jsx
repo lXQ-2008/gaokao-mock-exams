@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Container, Box, Typography, Stack, Snackbar, Alert } from '@mui/material';
+import { Container, Box, Typography } from '@mui/material';
 import Navbar from './components/Navbar';
 import ExamList from './components/ExamList';
 import ExamDetail from './components/ExamDetail';
@@ -10,32 +10,29 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSubject, setActiveSubject] = useState('all');
   const [activeDifficulty, setActiveDifficulty] = useState('all');
+  const [activeExamType, setActiveExamType] = useState('all');
   const [selectedExam, setSelectedExam] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   const handleViewDetail = (exam) => setSelectedExam(exam);
   const handleCloseDetail = () => setSelectedExam(null);
-  const handleDownload = (exam) => {
-    setSnackbar({
-      open: true,
-      message: `「${exam.title}」下载功能开发中，敬请期待`,
-    });
-  };
-  const handleCloseSnackbar = () => setSnackbar({ open: false, message: '' });
 
   const filteredExams = useMemo(() => {
     return EXAMS.filter((exam) => {
       const matchSubject = activeSubject === 'all' || exam.subject === activeSubject;
       const matchDifficulty = activeDifficulty === 'all' || exam.difficulty === activeDifficulty;
+      const matchType =
+        activeExamType === 'all' ||
+        (activeExamType === '真题' && exam.isRealExam) ||
+        (activeExamType === '模拟' && !exam.isRealExam);
       const q = searchQuery.toLowerCase().trim();
       const matchSearch =
         !q ||
         exam.title.toLowerCase().includes(q) ||
         exam.region.toLowerCase().includes(q) ||
         exam.source.toLowerCase().includes(q);
-      return matchSubject && matchDifficulty && matchSearch;
+      return matchSubject && matchDifficulty && matchType && matchSearch;
     });
-  }, [activeSubject, activeDifficulty, searchQuery]);
+  }, [activeSubject, activeDifficulty, activeExamType, searchQuery]);
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -71,19 +68,21 @@ export default function App() {
               color: 'text.primary',
             }}
           >
-            近期优质模拟题
+            高考真题与模拟题
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            收录 2025 — 2026 年各地模拟试卷 · 共 {EXAMS.length} 套
+            收录 2024 — 2026 年高考真题及优质模拟卷 · 共 {EXAMS.length} 套
           </Typography>
         </Box>
 
-        {/* 筛选栏 — 合并科目+难度 */}
+        {/* 筛选栏 */}
         <FilterBar
           activeSubject={activeSubject}
           onSubjectChange={setActiveSubject}
           activeDifficulty={activeDifficulty}
           onDifficultyChange={setActiveDifficulty}
+          activeExamType={activeExamType}
+          onExamTypeChange={setActiveExamType}
         />
 
         {/* 结果提示 */}
@@ -96,11 +95,10 @@ export default function App() {
           {searchQuery.trim() && ` — 「${searchQuery}」`}
         </Typography>
 
-        {/* 试卷列表 — 两列 */}
+        {/* 试卷列表 */}
         <ExamList
           exams={filteredExams}
           onViewDetail={handleViewDetail}
-          onDownload={handleDownload}
         />
       </Container>
 
@@ -117,7 +115,7 @@ export default function App() {
         }}
       >
         <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
-          高考模拟题精选 · 仅供参考
+          高考真题与模拟题精选 · 仅供参考
         </Typography>
       </Box>
 
@@ -127,28 +125,6 @@ export default function App() {
         open={!!selectedExam}
         onClose={handleCloseDetail}
       />
-
-      {/* 下载提示 */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={2500}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="info"
-          variant="outlined"
-          sx={{
-            borderRadius: 2,
-            bgcolor: '#fff',
-            border: '1px solid #d4d8e0',
-            color: 'text.primary',
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

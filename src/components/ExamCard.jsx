@@ -9,12 +9,12 @@ import {
   Box,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import DownloadIcon from '@mui/icons-material/Download';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import { getSubjectColor, getDifficultyColor } from '../data/examData';
 
-export default function ExamCard({ exam, onViewDetail, onDownload }) {
+export default function ExamCard({ exam, onViewDetail }) {
   const subjectColor = getSubjectColor(exam.subject);
   const difficultyColor = getDifficultyColor(exam.difficulty);
 
@@ -26,22 +26,27 @@ export default function ExamCard({ exam, onViewDetail, onDownload }) {
         display: 'flex',
         flexDirection: 'column',
         py: 1,
+        border: exam.isRealExam ? '1px solid #f0d5d5' : 'none',
       }}
     >
       <CardContent sx={{ flex: 1, pb: 0.5, px: 3 }}>
-        {/* 标题 */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 600,
-            mb: 1.5,
-            lineHeight: 1.45,
-            fontSize: { xs: '0.95rem', sm: '1.05rem' },
-            color: 'text.primary',
-          }}
-        >
-          {exam.title}
-        </Typography>
+        {/* 真题标记 + 标题 */}
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
+          {exam.isRealExam && (
+            <VerifiedIcon sx={{ fontSize: 18, color: '#dc2626', mt: 0.3, flexShrink: 0 }} />
+          )}
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              lineHeight: 1.45,
+              fontSize: { xs: '0.95rem', sm: '1.05rem' },
+              color: 'text.primary',
+            }}
+          >
+            {exam.title}
+          </Typography>
+        </Box>
 
         {/* 标签行 */}
         <Stack direction="row" spacing={0.8} flexWrap="wrap" gap={0.5} sx={{ mb: 2 }}>
@@ -63,6 +68,30 @@ export default function ExamCard({ exam, onViewDetail, onDownload }) {
               fontWeight: 600,
             }}
           />
+          {exam.isRealExam && (
+            <Chip
+              label="真题"
+              size="small"
+              sx={{
+                bgcolor: '#fef2f2',
+                color: '#dc2626',
+                fontWeight: 700,
+                border: '1px solid #fecaca',
+              }}
+            />
+          )}
+          {exam.version && (
+            <Chip
+              label={exam.version}
+              size="small"
+              sx={{
+                bgcolor: exam.version === '空白卷' ? '#eff6ff' : '#f0fdf4',
+                color: exam.version === '空白卷' ? '#2563eb' : '#16a34a',
+                fontWeight: 600,
+                fontSize: '0.7rem',
+              }}
+            />
+          )}
         </Stack>
 
         {/* 描述 */}
@@ -82,7 +111,7 @@ export default function ExamCard({ exam, onViewDetail, onDownload }) {
           {exam.description}
         </Typography>
 
-        {/* 元信息 — 极简 */}
+        {/* 元信息 */}
         <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
             <LocationOnIcon sx={{ fontSize: 14 }} />
@@ -99,7 +128,7 @@ export default function ExamCard({ exam, onViewDetail, onDownload }) {
         </Stack>
       </CardContent>
 
-      <CardActions sx={{ px: 3, pb: 2, pt: 0, gap: 1 }}>
+      <CardActions sx={{ px: 3, pb: 2, pt: 0 }}>
         <Button
           size="small"
           variant="text"
@@ -113,21 +142,6 @@ export default function ExamCard({ exam, onViewDetail, onDownload }) {
           }}
         >
           查看详情
-        </Button>
-        <Box sx={{ flex: 1 }} />
-        <Button
-          size="small"
-          variant="text"
-          startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
-          onClick={() => onDownload(exam)}
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 400,
-            fontSize: '0.78rem',
-            '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' },
-          }}
-        >
-          下载
         </Button>
       </CardActions>
     </Card>

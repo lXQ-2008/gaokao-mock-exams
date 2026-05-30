@@ -2,7 +2,7 @@ import { Grid, Box, Typography } from '@mui/material';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import ExamCard from './ExamCard';
 
-export default function ExamList({ exams, onViewDetail, onDownload }) {
+export default function ExamList({ exams, onViewDetail }) {
   if (exams.length === 0) {
     return (
       <Box
@@ -36,7 +36,6 @@ export default function ExamList({ exams, onViewDetail, onDownload }) {
             <ExamCard
               exam={exam}
               onViewDetail={onViewDetail}
-              onDownload={onDownload}
             />
           </Box>
         </Grid>
